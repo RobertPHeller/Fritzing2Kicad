@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : Sun May 12 20:48:45 2019
-#  Last Modified : <190512.2055>
+#  Last Modified : <190512.2237>
 #
 #  Description	
 #
@@ -51,7 +51,7 @@ SUBDIRS = BuildScripts BuildData Scripts ExtraDoc
 EXTRA_DIST = README.md Doxyfile.in bootstrap
 
 clean-local:
-	-rm -rf man html latex Fritzing2Kicad.pdf
+	-rm -rf man latex Fritzing2Kicad.pdf
 
 Fritzing2KicadModules = 
 
@@ -62,30 +62,11 @@ man_MANS = man1/Fritzing2Kicad.1
 pkgdatadir = $(datadir)/$(PACKAGE)/Doc
 pkgdata_DATA = Fritzing2Kicad.pdf
 
-install-data-hook: $(top_builddir)/html/index.html
-	$(INSTALL) -d $(DESTDIR)$(pkgdatadir)/html
-	for p in html/*; do \
-	   if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	    f=`echo $$p | sed -e 's|^.*/||'`; \
-	    echo " $(INSTALL_DATA) '$$d$$p' '$(DESTDIR)$(pkgdatadir)/html/$$f'"; \
-	    $(INSTALL_DATA) "$$d$$p" "$(DESTDIR)$(pkgdatadir)/html/$$f"; \
-	done
-
-uninstall-hook:  
-	$(INSTALL) -d $(DESTDIR)$(pkgdatadir)/html
-	for p in html/*; do \
-	   if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	    f=`echo $$p | sed -e 's|^.*/||'`; \
-	    echo " rm -f '$(DESTDIR)$(pkgdatadir)/html/$$f'"; \
-	    rm -f "$(DESTDIR)$(pkgdatadir)/html/$$f"; \
-	done
-
 TCLKIT = $(top_builddir)/BuildData/tclkit${BEXEEXT}
 BUILT_SOURCES = $(TCLKIT)
 
 Fritzing2Kicad$(EXEEXT) : Scripts/Fritzing2Kicad.tcl \
-	$(Fritzing2KicadLib) $(top_builddir)/html/index.html \
-	ExtraDoc/Version.tcl
+	$(Fritzing2KicadLib) ExtraDoc/Version.tcl
 	-rm -rf Fritzing2Kicad.vfs
 	$(TCLKIT) $(top_srcdir)/BuildScripts/sdx.kit qwrap $(srcdir)/Scripts/Fritzing2Kicad.tcl
 	$(TCLKIT) $(top_srcdir)/BuildScripts/sdx.kit unwrap Fritzing2Kicad.kit
@@ -100,19 +81,15 @@ Fritzing2Kicad$(EXEEXT) : Scripts/Fritzing2Kicad.tcl \
 		Common
 	$(UNZIP) -qq -d Fritzing2Kicad.vfs/lib \
 		$(top_srcdir)/BuildData/Tclxml3.1-GenericPureTcl.zip
-	$(TCLKIT) $(top_srcdir)/BuildScripts/AddKitFile.kit Fritzing2Kicad \
-		Help $(top_builddir)/html/*
 	$(TCLKIT) $(top_srcdir)/BuildScripts/sdx.kit wrap Fritzing2Kicad${EXEEXT} -runtime $(top_srcdir)/BuildData/$(TCLKITRUN)
 	-rm -rf Fritzing2Kicad.vfs Fritzing2Kicad.kit
-endif
 
 
-$(top_builddir)/html/index.html \
-	man1/Fritzing2Kicad.1 \
-	Fritzing2Kicad.pdf : Doxyfile Scripts/Fritzing2Kicad.tcl \
+man1/Fritzing2Kicad.1 Fritzing2Kicad.pdf : \
+		Doxyfile Scripts/Fritzing2Kicad.tcl \
 		$(Fritzing2KicadModules) $(wildcard ExtraDoc/*.h) \
 		ExtraDoc/Version.tcl BuildScripts/tcldoxyfilter.sh
-	-rm -rf man1 html latex
+	-rm -rf man1 latex
 	$(DOXYGEN)
 	$(MAKE) -C latex
 	mv latex/refman.pdf ./Fritzing2Kicad.pdf

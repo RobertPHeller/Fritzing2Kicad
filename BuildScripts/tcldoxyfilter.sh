@@ -1,2 +1,2 @@
 #!/bin/sh
-/home/heller/FritzingPartsSVGEditor/BuildData/tclkit /home/heller/FritzingPartsSVGEditor/BuildScripts/tcl2dox.kit $*
+/home/heller/Fritzing2Kicad/BuildData/tclkit /home/heller/Fritzing2Kicad/BuildScripts/tcl2dox.kit $*
